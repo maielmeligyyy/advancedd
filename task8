@@ -1,0 +1,134 @@
+#include <iostream>
+#include <vector>
+#include <limits>
+
+using namespace std;
+
+const char PLAYER_X = 'X';
+const char PLAYER_O = 'O';
+const char EMPTY = ' ';
+
+class TicTacToe {
+public:
+    TicTacToe() : board(9, EMPTY) {}
+
+    void displayBoard() {
+        cout << " " << board[0] << " | " << board[1] << " | " << board[2] << endl;
+        cout << "---+---+---" << endl;
+        cout << " " << board[3] << " | " << board[4] << " | " << board[5] << endl;
+        cout << "---+---+---" << endl;
+        cout << " " << board[6] << " | " << board[7] << " | " << board[8] << endl;
+    }
+
+    bool isWinner(char player) {
+        const vector<vector<int>> winConditions = {
+            {0, 1, 2}, {3, 4, 5}, {6, 7, 8}, // Rows
+            {0, 3, 6}, {1, 4, 7}, {2, 5, 8}, // Columns
+            {0, 4, 8}, {2, 4, 6}             // Diagonals
+        };
+        for (const auto& condition : winConditions) {
+            if (board[condition[0]] == player &&
+                board[condition[1]] == player &&
+                board[condition[2]] == player) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool isBoardFull() {
+        return all_of(board.begin(), board.end(), [](char c) { return c != EMPTY; });
+    }
+
+    int minimax(int depth, bool isMaximizing) {
+        if (isWinner(PLAYER_O)) return 1;  // If PLAYER_O wins
+        if (isWinner(PLAYER_X)) return -1; // If PLAYER_X wins
+        if (isBoardFull()) return 0;       // Draw
+
+        if (isMaximizing) {
+            int bestScore = numeric_limits<int>::min();
+            for (int i = 0; i < 9; ++i) {
+                if (board[i] == EMPTY) {
+                    board[i] = PLAYER_O;
+                    int score = minimax(depth + 1, false);
+                    board[i] = EMPTY;
+                    bestScore = max(score, bestScore);
+                }
+            }
+            return bestScore;
+        } else {
+            int bestScore = numeric_limits<int>::max();
+            for (int i = 0; i < 9; ++i) {
+                if (board[i] == EMPTY) {
+                    board[i] = PLAYER_X;
+                    int score = minimax(depth + 1, true);
+                    board[i] = EMPTY;
+                    bestScore = min(score, bestScore);
+                }
+            }
+            return bestScore;
+        }
+    }
+
+    int findBestMove() {
+        int bestScore = numeric_limits<int>::min();
+        int bestMove = -1;
+        for (int i = 0; i < 9; ++i) {
+            if (board[i] == EMPTY) {
+                board[i] = PLAYER_O;
+                int score = minimax(0, false);
+                board[i] = EMPTY;
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestMove = i;
+                }
+            }
+        }
+        return bestMove;
+    }
+
+    void makeMove(int index, char player) {
+        if (index >= 0 && index < 9 && board[index] == EMPTY) {
+            board[index] = player;
+        }
+    }
+
+    bool isGameOver() {
+        return isWinner(PLAYER_X) || isWinner(PLAYER_O) || isBoardFull();
+    }
+
+private:
+    vector<char> board;
+};
+
+int main() {
+    TicTacToe game;
+    char currentPlayer = PLAYER_X;
+
+    while (!game.isGameOver()) {
+        game.displayBoard();
+        if (currentPlayer == PLAYER_X) {
+            int move;
+            cout << "Enter your move (0-8): ";
+            cin >> move;
+            game.makeMove(move, PLAYER_X);
+        } else {
+            int bestMove = game.findBestMove();
+            game.makeMove(bestMove, PLAYER_O);
+            cout << "Computer chose position " << bestMove << endl;
+        }
+        currentPlayer = (currentPlayer == PLAYER_X) ? PLAYER_O : PLAYER_X;
+    }
+
+    game.displayBoard();
+
+    if (game.isWinner(PLAYER_X)) {
+        cout << "Player X wins!" << endl;
+    } else if (game.isWinner(PLAYER_O)) {
+        cout << "Computer (Player O) wins!" << endl;
+    } else {
+        cout << "It's a draw!" << endl;
+    }
+
+    return 0;
+}
