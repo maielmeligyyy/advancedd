@@ -1,0 +1,55 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+class TreeNode {
+public:
+    int val;
+    vector<TreeNode*> children;
+
+    TreeNode(int val) : val(val) {}
+};
+
+int computeHeightAndPrint(TreeNode* node) {
+    if (node == nullptr)
+        return -1;
+
+    int height = -1;
+    for (TreeNode* child : node->children) {
+        height = max(height, computeHeightAndPrint(child));
+    }
+    height += 1;
+
+    cout << "Node: " << node->val << ", Height: " << height << endl;
+    return height;
+}
+
+int main() {
+  
+    TreeNode* root = new TreeNode(1);
+    TreeNode* node2 = new TreeNode(2);
+    TreeNode* node3 = new TreeNode(3);
+    TreeNode* node4 = new TreeNode(4);
+    TreeNode* node5 = new TreeNode(5);
+    TreeNode* node6 = new TreeNode(6);
+
+    root->children.push_back(node2);
+    root->children.push_back(node3);
+    node2->children.push_back(node4);
+    node2->children.push_back(node5);
+    node3->children.push_back(node6);
+
+   
+    computeHeightAndPrint(root);
+
+
+    delete node6;
+    delete node5;
+    delete node4;
+    delete node3;
+    delete node2;
+    delete root;
+
+    return 0;
+}
