@@ -1,0 +1,85 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+class SimpleTextEditor {
+public:
+    SimpleTextEditor() : text(""), cursor(0) {}
+
+    void left() {
+        if (cursor > 0) {
+            cursor--; 
+        }
+    }
+
+    void right() {
+        if (cursor < text.length()) {
+            cursor++;  
+        }
+    }
+
+    void insert(char c) {
+        text.insert(cursor, 1, c); 
+        cursor++;  
+    }
+
+    void deleteChar() {
+        if (cursor < text.length()) {
+            text.erase(cursor, 1);  
+        }
+    }
+
+    void display() const {
+        cout << "Text: " << text << endl;
+        cout << "Cursor position: " << cursor << endl;
+        
+        for (int i = 0; i < text.length(); ++i) {
+            if (i == cursor) {
+                cout << '|';  
+            }
+            cout << text[i];
+        }
+        if (cursor == text.length()) {
+            cout << '|';  
+        }
+        cout << endl;
+    }
+
+private:
+    string text;  
+    size_t cursor; 
+};
+
+int main() {
+    SimpleTextEditor editor;
+
+    // Inserting "Hello"
+    editor.insert('H');
+    editor.insert('e');
+    editor.insert('l');
+    editor.insert('l');
+    editor.insert('o');
+    editor.display();  // Display: Hello|
+
+    // Moving cursor left twice and inserting a space
+    editor.left();
+    editor.left();
+    editor.insert(' ');
+    editor.display();  // Display: Hel |lo
+
+    // Moving cursor right and deleting a character
+    editor.right();
+    editor.deleteChar();
+    editor.display();  // Display: Hel |o
+
+    // Inserting "World"
+    editor.insert('W');
+    editor.insert('o');
+    editor.insert('r');
+    editor.insert('l');
+    editor.insert('d');
+    editor.display();  // Display: Hel Wo|rld
+
+    return 0;
+}
