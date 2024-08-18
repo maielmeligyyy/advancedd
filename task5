@@ -1,0 +1,79 @@
+#include <iostream>
+#include <vector>
+#include <stdexcept>
+#include <functional>
+
+using namespace std;
+
+class CuckooHashTable {
+public:
+    CuckooHashTable(int size) : size(size), table1(size, -1), table2(size, -1), maxLoop(50) {}
+
+    int hash1(int key) {
+        return key % size;
+    }
+
+    int hash2(int key) {
+        return (key / size) % size;
+    }
+
+    void insert(int key) {
+        if (search(key)) return;
+
+        int position1 = hash1(key);
+        if (table1[position1] == -1) {
+            table1[position1] = key;
+            return;
+        }
+
+        int position2 = hash2(key);
+        if (table2[position2] == -1) {
+            table2[position2] = key;
+            return;
+        }
+
+        int loopCount = 0;
+        while (loopCount < maxLoop) {
+            swap(key, table1[position1]);
+            position2 = hash2(key);
+            if (table2[position2] == -1) {
+                table2[position2] = key;
+                return;
+            }
+            swap(key, table2[position2]);
+            position1 = hash1(key);
+            loopCount++;
+        }
+
+        rehash();
+        insert(key);
+    }
+
+    void rehash() {
+        vector<int> oldTable1 = table1;
+        vector<int> oldTable2 = table2;
+        table1.assign(size, -1);
+        table2.assign(size, -1);
+      
+        
+    }
+
+    bool search(int key) {
+        if (table1[hash1(key)] == key || table2[hash2(key)] == key) return true;
+        return false;
+    }
+
+private:
+    int size;
+    vector<int> table1, table2;
+    int maxLoop;
+};
+
+int main() {
+    CuckooHashTable cuckooHash(11);
+    cuckooHash.insert(10);
+    cuckooHash.insert(22);
+    
+    cout << "Search for 22: " << (cuckooHash.search(22) ? "Found" : "Not Found") << endl;
+    return 0;
+}
