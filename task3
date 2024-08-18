@@ -1,0 +1,74 @@
+#include <iostream>
+
+using namespace std;
+
+struct Node {
+    int data;
+    Node* prev;
+    Node* next;
+
+    Node(int data) : data(data), prev(nullptr), next(nullptr) {}
+};
+
+class DoublyLinkedList {
+public:
+    Node* head;
+    Node* tail;
+
+    DoublyLinkedList() : head(nullptr), tail(nullptr) {}
+
+    void append(int data) {
+        Node* newNode = new Node(data);
+        if (!head) {
+            head = newNode;
+            tail = newNode;
+        } else {
+            tail->next = newNode;
+            newNode->prev = tail;
+            tail = newNode;
+        }
+    }
+
+    void printList() {
+        Node* current = head;
+        cout << "Current List: ";
+        while (current != nullptr) {
+            cout << current->data << " <-> ";
+            current = current->next;
+        }
+        cout << "NULL" << endl;
+    }
+
+    Node* findMiddle() {
+        if (!head) return nullptr;
+
+        Node* slow = head;
+        Node* fast = head;
+        
+        cout << "Initial Positions -> Slow: " << slow->data << ", Fast: " << fast->data << endl;
+        
+        while (fast && fast->next) {
+            fast = fast->next->next;
+            if (fast)
+                slow = slow->next;
+
+            cout << "Updated Positions -> Slow: " << (slow ? to_string(slow->data) : "NULL");
+            cout << ", Fast: " << (fast ? to_string(fast->data) : "NULL") << endl;
+        }
+        return slow;
+    }
+};
+
+int main() {
+    DoublyLinkedList dll;
+    for (int i = 5; i <= 9; ++i) // Changed loop to start from 5 to 9
+        dll.append(i);
+
+    dll.printList(); // Print the current state of the list
+    Node* middleNode = dll.findMiddle();
+    
+    if (middleNode)
+        cout << "Middle Node Data: " << middleNode->data << endl;
+
+    return 0;
+}
